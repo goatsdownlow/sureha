@@ -16,6 +16,42 @@ set_lock_state:
       selector:
         select:
           { options: ["locked_all", "locked_in", "locked_out", "unlocked"] }
+add_to_feeder:
+  name: Add to feeder
+  description: Add pet to feeder
+  fields:
+    device_id:
+      name: Device ID
+      description: Feeder ID to add to
+      required: true
+      example: "123456"
+      selector:
+        text:
+    tag_id:
+      name: Tag ID
+      description: Tag ID to add to Feeder
+      required: true
+      example: 31337
+      selector:
+        text:
+remove_from_feeder:
+  name: Remove from feeder
+  description: Remove per from feeder
+  fields:
+    device_id:
+      name: Device ID
+      description: Feeder ID to remove from
+      required: true
+      example: "123456"
+      selector:
+        text:
+    tag_id:
+      name: Tag ID
+      description: Tag ID to remove from Feeder
+      required: true
+      example: 31337
+      selector:
+        text:
 set_pet_location:
   name: Set Pet location
   description: Sets the location of a pet
