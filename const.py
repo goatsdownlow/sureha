@@ -24,6 +24,14 @@ SERVICE_SET_LOCK_STATE = "set_lock_state"
 ATTR_FLAP_ID = "flap_id"
 ATTR_LOCK_STATE = "lock_state"
 
+SERVICE_ADD_TO_FEEDER = "add_to_feeder"
+ATTR_DEVICE_ID = "device_id"
+ATTR_TAG_ID = "tag_id"
+
+SERVICE_REMOVE_FROM_FEEDER = "remove_from_feeder"
+ATTR_DEVICE_ID = "device_id"
+ATTR_TAG_ID = "tag_id"
+
 SERVICE_PET_LOCATION = "set_pet_location"
 ATTR_PET_ID = "pet_id"
 ATTR_WHERE = "where"
