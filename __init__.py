@@ -146,7 +146,15 @@ class SurePetcareAPI:
         """Add pet to feeder."""
 
         await self.surepy.sac._add_tag_to_device(device_id, tag_id)
-
+    
+    async def trial_add_tag_to_device(self, device_id: int, tag_id: int) -> None:
+        """TRIAL Add the specified tag ID to the specified device ID"""
+        
+        
+        resource = "https://app.api.surehub.io/api/device/" + str(device_id) + "/tag/"  + str(tag_id)
+        data = {}
+        await self.surepy.sac.call(method="PUT", resource=resource, data=data)
+        
     async def remove_from_feeder(self, device_id: int, tag_id: int) -> None:
         """Remove pet from to feeder."""
         
@@ -259,7 +267,8 @@ class SurePetcareAPI:
                     device_id := int(call.data.get(ATTR_DEVICE_ID))
                 ):
 
-                    await self.add_to_feeder(device_id, tag_id)
+                    # await self.add_to_feeder(device_id, tag_id)
+                    await self.trial_add_tag_to_device(device_id, tag_id)
                     await self.coordinator.async_request_refresh()
 
             except ValueError as error:
