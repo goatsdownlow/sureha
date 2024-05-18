@@ -25,16 +25,16 @@ from .const import (
     ATTR_FLAP_ID,
     ATTR_LOCK_STATE,
     ATTR_PET_ID,
-    ATTR_VOLTAGE_FULL,
-    ATTR_VOLTAGE_LOW,
+    ATTR_DEVICE_ID,
+    ATTR_TAG_ID,
     ATTR_WHERE,
     DOMAIN,
     SERVICE_PET_LOCATION,
+    SERVICE_ADD_TO_FEEDER,
+    SERVICE_REMOVE_FROM_FEEDER,
     SERVICE_SET_LOCK_STATE,
     SPC,
     SURE_API_TIMEOUT,
-    SURE_BATT_VOLTAGE_FULL,
-    SURE_BATT_VOLTAGE_LOW,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -70,16 +70,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up."""
 
     hass.data.setdefault(DOMAIN, {})
-
-    # set option defaults
-    if not entry.options:
-        hass.config_entries.async_update_entry(
-            entry,
-            options={
-                ATTR_VOLTAGE_FULL: SURE_BATT_VOLTAGE_FULL,
-                ATTR_VOLTAGE_LOW: SURE_BATT_VOLTAGE_LOW,
-            },
-        )
 
     try:
         surepy = Surepy(
@@ -152,6 +142,16 @@ class SurePetcareAPI:
 
         await self.surepy.sac.set_pet_location(pet_id, location)
 
+    async def add_to_feeder(self, device_id: int, tag_id: int) -> None:
+        """Add pet to feeder."""
+
+        await self.surepy.sac._add_tag_to_device(device_id, tag_id)
+
+    async def remove_from_feeder(self, device_id: int, tag_id: int) -> None:
+        """Remove pet from to feeder."""
+        
+        await self.surepy.sac._remove_tag_from_device(device_id, tag_id)
+
     async def set_lock_state(self, flap_id: int, state: str) -> None:
         """Update the lock state of a flap."""
 
@@ -219,6 +219,12 @@ class SurePetcareAPI:
                 ),
             }
         )
+        device_pet_schema = vol.Schema(
+            {
+                vol.Required(ATTR_TAG_ID): vol.Any(cv.positive_int, cv.positive_int),
+                vol.Required(ATTR_DEVICE_ID): vol.Any(cv.positive_int, cv.positive_int)
+            }
+        )
 
         async def handle_set_pet_location(call: Any) -> None:
             """Call when setting the lock state."""
@@ -242,6 +248,54 @@ class SurePetcareAPI:
             SERVICE_PET_LOCATION,
             handle_set_pet_location,
             schema=pet_location_service_schema,
+        )
+
+        async def handle_add_to_feeder(call: Any) -> None:
+            """Call when adding to feeder."""
+
+            try:
+
+                if (tag_id := int(call.data.get(ATTR_TAG_ID))) and (
+                    device_id := int(call.data.get(ATTR_DEVICE_ID))
+                ):
+
+                    await self.add_to_feeder(device_id, tag_id)
+                    await self.coordinator.async_request_refresh()
+
+            except ValueError as error:
+                _LOGGER.error(
+                    "🐾 \x1b[38;2;255;26;102m·\x1b[0m arguments of wrong type: %s", error
+                )
+        
+        self.hass.services.async_register(
+            DOMAIN,
+            SERVICE_ADD_TO_FEEDER,
+            handle_add_to_feeder,
+            schema=device_pet_schema,
+        )
+
+        async def handle_remove_from_feeder(call: Any) -> None:
+            """Call when removing from feeder."""
+
+            try:
+
+                if (tag_id := int(call.data.get(ATTR_TAG_ID))) and (
+                    device_id := int(call.data.get(ATTR_DEVICE_ID))
+                ):
+
+                    await self.remove_from_feeder(device_id, tag_id)
+                    await self.coordinator.async_request_refresh()
+
+            except ValueError as error:
+                _LOGGER.error(
+                    "🐾 \x1b[38;2;255;26;102m·\x1b[0m arguments of wrong type: %s", error
+                )
+
+        self.hass.services.async_register(
+            DOMAIN,
+            SERVICE_REMOVE_FROM_FEEDER,
+            handle_remove_from_feeder,
+            schema=device_pet_schema,
         )
 
         async def handle_set_lock_state(call: Any) -> None:
