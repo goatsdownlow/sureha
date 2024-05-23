@@ -49,7 +49,7 @@ from .const import (
     USER_AGENT,
 )
 from .enums import Location, LockState
-from .exceptions import SurePetcareAuthenticationError, SurePetcareConnectionError, SurePetcareError
+from .exeptions import SurePetcareAuthenticationError, SurePetcareConnectionError, SurePetcareError
 
 
 TOKEN_ENV = "SUREPY_TOKEN"  # nosec

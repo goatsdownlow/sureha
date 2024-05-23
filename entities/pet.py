@@ -13,8 +13,8 @@ from datetime import datetime
 from typing import Any
 from urllib.parse import urlparse
 
-from .entities import PetActivity, PetLocation, StateDrinking, StateFeeding, SurepyEntity
-from .entities.states import PetState
+from ..entities import PetActivity, PetLocation, StateDrinking, StateFeeding, SurepyEntity
+from ..entities.states import PetState
 from ..enums import EntityType, FoodType, Location
 
 

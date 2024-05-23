@@ -6,7 +6,7 @@ from datetime import datetime
 from pprint import pformat
 from typing import Any
 
-from sureha.enums import EntityType, Location
+from ..enums import EntityType, Location
 
 
 class SurepyEntity(ABC):

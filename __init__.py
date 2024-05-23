@@ -14,6 +14,7 @@ from uuid import uuid1
 import aiohttp
 
 import async_timeout
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -21,17 +22,18 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from sureha import Sureha
-from sureha.entities import SurepyEntity
-from sureha.enums import EntityType, Location, LockState
-from sureha.exceptions import SurePetcareAuthenticationError, SurePetcareError
+
+from .entities import SurepyEntity
+from .enums import EntityType, Location, LockState
+from .exeptions import SurePetcareAuthenticationError, SurePetcareError
+
 import voluptuous as vol
 
 
 from rich.console import Console
 
-from sureha.client import SureAPIClient, find_token, token_seems_valid
-from sureha.const import (
+from .client import SureAPIClient, find_token, token_seems_valid
+from .const import (
     API_TIMEOUT,
     ATTRIBUTES_RESOURCE as ATTR_RESOURCE,
     BASE_RESOURCE,
@@ -41,9 +43,9 @@ from sureha.const import (
     TIMELINE_RESOURCE,
 )
 
-from sureha.entities.devices import Feeder, Felaqua, Flap, Hub, SurepyDevice
-from sureha.entities.pet import Pet
-from sureha.enums import EntityType
+from .entities.devices import Feeder, Felaqua, Flap, Hub, SurepyDevice
+from .entities.pet import Pet
+from .enums import EntityType
 
 
 
@@ -131,7 +133,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             # asyncio.TimeoutError and aiohttp.ClientError already handled
 
             async with async_timeout.timeout(20):
-                return await spc.surepy.get_entities(refresh=True)
+                return await client.get_entities(refresh=True)
 
         except SurePetcareAuthenticationError as err:
             raise ConfigEntryAuthFailed from err
@@ -172,12 +174,12 @@ class SurePetcareAPI:
     async def set_pet_location(self, pet_id: int, location: Location) -> None:
         """Update the lock state of a flap."""
 
-        await self.surepy.sac.set_pet_location(pet_id, location)
+        await self.client.sac.set_pet_location(pet_id, location)
 
     async def add_to_feeder(self, device_id: int, tag_id: int) -> None:
         """Add pet to feeder."""
 
-        await self.surepy.sac._add_tag_to_device(device_id, tag_id)
+        await self.client.sac._add_tag_to_device(device_id, tag_id)
     
     async def trial_add_tag_to_device(self, device_id: int, tag_id: int) -> None:
         """TRIAL Add the specified tag ID to the specified device ID"""
@@ -185,12 +187,12 @@ class SurePetcareAPI:
         
         resource = "https://app.api.surehub.io/api/device/" + str(device_id) + "/tag/"  + str(tag_id)
         data = {}
-        await self.surepy.sac.call(method="PUT", resource=resource, data=data)
+        await self.client.sac.call(method="PUT", resource=resource, data=data)
         
     async def remove_from_feeder(self, device_id: int, tag_id: int) -> None:
         """Remove pet from to feeder."""
         
-        await self.surepy.sac._remove_tag_from_device(device_id, tag_id)
+        await self.client.sac._remove_tag_from_device(device_id, tag_id)
 
     async def set_lock_state(self, flap_id: int, state: str) -> None:
         """Update the lock state of a flap."""
@@ -198,10 +200,10 @@ class SurePetcareAPI:
         # https://github.com/PyCQA/pylint/issues/2062
         # pylint: disable=no-member
         lock_states = {
-            LockState.UNLOCKED.name.lower(): self.surepy.sac.unlock,
-            LockState.LOCKED_IN.name.lower(): self.surepy.sac.lock_in,
-            LockState.LOCKED_OUT.name.lower(): self.surepy.sac.lock_out,
-            LockState.LOCKED_ALL.name.lower(): self.surepy.sac.lock,
+            LockState.UNLOCKED.name.lower(): self.client.sac.unlock,
+            LockState.LOCKED_IN.name.lower(): self.client.sac.lock_in,
+            LockState.LOCKED_OUT.name.lower(): self.client.sac.lock_out,
+            LockState.LOCKED_ALL.name.lower(): self.client.sac.lock,
         }
 
         # elegant functions dict to choose the right function | idea by @janiversen

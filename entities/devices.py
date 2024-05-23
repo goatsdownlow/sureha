@@ -15,7 +15,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from ..const import SURE_BATT_VOLTAGE_FULL, SURE_BATT_VOLTAGE_LOW
-from .entities import SurepyEntity
+from ..entities import SurepyEntity
 from ..enums import BowlPosition, FoodType, LockState
 
 
