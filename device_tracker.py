@@ -4,9 +4,9 @@ from typing import Any
 
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from surepy.entities import EntityType
-from surepy.entities.pet import Pet as SurePet
-from surepy.enums import Location
+from .entities import EntityType
+from .entities.pet import Pet as SurePet
+from .enums import Location
 
 # pylint: disable=relative-beyond-top-level
 from . import DOMAIN, SurePetcareAPI

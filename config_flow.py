@@ -8,8 +8,8 @@ from homeassistant import config_entries, core, data_entry_flow
 from homeassistant.const import CONF_PASSWORD, CONF_TOKEN, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from sureha import Sureha
-from sureha.exceptions import SurePetcareAuthenticationError, SurePetcareError
+from .exeptions import SurePetcareAuthenticationError, SurePetcareError
+from ..sureha import Surepy
 import voluptuous as vol
 
 # pylint: disable=relative-beyond-top-level

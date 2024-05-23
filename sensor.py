@@ -14,15 +14,15 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from surepy.entities import SurepyEntity
-from surepy.entities.devices import (
+from .entities import SurepyEntity
+from .entities.devices import (
     Feeder as SureFeeder,
     FeederBowl as SureFeederBowl,
     Felaqua as SureFelaqua,
     Flap as SureFlap,
     SurepyDevice,
 )
-from surepy.enums import EntityType, LockState
+from .enums import EntityType, LockState
 
 # pylint: disable=relative-beyond-top-level
 from . import SurePetcareAPI
